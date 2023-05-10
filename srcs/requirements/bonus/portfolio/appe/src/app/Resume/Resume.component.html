@@ -1,0 +1,28 @@
+<div class="row middle-line">
+    <div class="col ml-3" >
+      <img src="../portfolio/assets/images/Experience.svg" class="img-fluid float-right">
+      <h4 class="resume-title text-center">Experiences</h4>
+      <div *ngFor="let item of _jobs">
+        <div class="resume-card">
+          <strong class="resume-card-title">
+            <i class="fa fa-building resume-icon" aria-hidden="true"></i>{{item.company}} ( {{item.date}} )
+          </strong>
+          <hr style="margin:1px !important;"><small>{{item.rank}}</small>
+          <p class="mb-auto">{{item.description}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <img src="../portfolio/assets/images/education.svg" class="img-fluid float-left">
+      <h4 class="resume-title text-center">Educations</h4>
+      <div *ngFor="let item of _educations">
+        <div class="resume-card">
+          <strong class="resume-card-title">
+            <i class="fa fa-graduation-cap resume-icon" aria-hidden="true"></i>{{item.school}}
+          </strong>
+          <hr style="margin:1px !important;"><small>{{item.date}}</small>
+          <p class="mb-auto">{{item.description}}</p>
+        </div>
+      </div>
+    </div>
+</div>

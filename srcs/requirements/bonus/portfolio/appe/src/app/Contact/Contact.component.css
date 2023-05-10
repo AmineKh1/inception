@@ -1,0 +1,16 @@
+.contact-card{
+    width: 100%;
+    text-align: center;
+    height: 250px;
+    font-family: 'Inter',sans-serif;
+}
+.contact-image{
+    width: 370px;
+    height: 320px;
+    display: block;
+    margin: auto;
+    padding-bottom: 40px;
+}
+.contact-card>form>h4{
+    font-family: 'Inter',sans-serif;
+}

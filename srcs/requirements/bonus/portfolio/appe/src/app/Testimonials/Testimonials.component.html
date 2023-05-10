@@ -1,0 +1,33 @@
+<div class="row ml-1">
+    <div class="col d-flex flex-column">
+        <div *ngFor="let item of _testimonials;let indexElement=index">
+            <div class="testimonial-card " *ngIf="indexElement %2==0">
+                <strong class="testimonial-text" style="float: left;">
+                    <i class="fa fa-quote-left mr-2" aria-hidden="true"></i>{{item.description}}
+                    <i class="fa fa-quote-right ml-2" aria-hidden="true"></i>
+                </strong>
+                <div class="testimonial-text" style="float: right;">
+                    {{item.name}} - {{item.company}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col d-flex flex-column">
+        <div *ngFor="let item of _testimonials;let indexElement=index">
+            <div class="testimonial-card " *ngIf="indexElement %2==0">
+                <strong class="testimonial-text" style="float: left;">
+                    <i class="fa fa-quote-left mr-2" aria-hidden="true"></i>{{item.description}}
+                    <i class="fa fa-quote-right ml-2" aria-hidden="true"></i>
+                </strong>
+                <div class="testimonial-text" style="float: right;">
+                    {{item.name}} - {{item.company}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <img src="../portfolio/assets/images/Reference.svg" class="img-fluid testimonial-image">
+    </div>
+</div>

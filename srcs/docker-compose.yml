@@ -1,0 +1,122 @@
+version: '3'
+
+networks:
+  inception:
+      driver: bridge
+services:
+  nginx:
+    build: requirements/nginx/
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - 443:443
+    init : true
+    networks:
+      - inception
+    volumes:
+      - wordpress:/wordpress
+
+  mariadb:
+    build: requirements/mariadb/
+    container_name: mariadb
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    init : true
+    networks:
+      - inception
+    volumes:
+      - data:/var/lib/mysql
+
+  wordpress:
+    build: requirements/wordpress/
+    container_name: wordpress
+    env_file:
+      - .env
+    restart: unless-stopped
+    init : true
+    # ports:
+    #   - 9000:9000
+    networks:
+      - inception
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress:/wordpress
+
+  redis:
+    build: requirements/bonus/redis/
+    container_name: redis
+    env_file:
+      - .env
+    restart: unless-stopped
+    init : true
+    ports:
+      - 6379:6379
+    networks:
+      - inception
+
+  ftp:
+    build: requirements/bonus/ftp/
+    container_name: ftp
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - 21:21
+      - "40000-40009:40000-40009"
+    init : true
+    networks:
+      - inception
+    volumes:
+      - wordpress:/home/akhouya42/ftp_directory/wordpress
+    
+  adminer:
+    build: requirements/bonus/adminer/
+    container_name: adminer
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    init : true
+    networks:
+      - inception
+  portfolio:
+    build: requirements/bonus/portfolio/
+    container_name: portfolio
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - 4200:4200
+    init : true
+    networks:
+      - inception
+  portainer:
+    build: requirements/bonus/portainer/
+    container_name: portainer
+    image : portainer
+    restart: 'always'
+    init : true
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer:/data
+    networks:
+      - inception
+volumes:
+  data:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/akhouya/data"
+  wordpress:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/akhouya/data"
+  portainer:
