@@ -3,6 +3,22 @@ version: '3'
 networks:
   inception:
       driver: bridge
+volumes:
+  data:
+    driver_opts:
+      type: "bind"
+      o: "bind"
+      device: "/home/akhouya/data/mysql"
+  wordpress:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/akhouya/data/wordpress"
+  portainer:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/akhouya/data/portainer"
 services:
   nginx:
     build: requirements/nginx/
@@ -15,21 +31,25 @@ services:
       - inception
     volumes:
       - wordpress:/wordpress
+    depends_on:
+      - wordpress
 
   mariadb:
-    build: requirements/mariadb/
     container_name: mariadb
-    env_file:
-      - .env
-    restart: unless-stopped
-    ports:
-      - 3306:3306
-    init : true
+    build: 
+      context : requirements/mariadb
+      args:
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DB
+      - MYSQL_HOST
+      - DB_ROOT_PASSWORD
+    restart: 'always'
+    volumes: 
+      - data:/var/lib/mysql/
     networks:
-      - inception
-    volumes:
-      - data:/var/lib/mysql
-
+        - inception
+    init: true
   wordpress:
     build: requirements/wordpress/
     container_name: wordpress
@@ -57,6 +77,8 @@ services:
       - 6379:6379
     networks:
       - inception
+    depends_on:
+      - wordpress
 
   ftp:
     build: requirements/bonus/ftp/
@@ -72,6 +94,8 @@ services:
       - inception
     volumes:
       - wordpress:/home/akhouya42/ftp_directory/wordpress
+    depends_on:
+      - wordpress
     
   adminer:
     build: requirements/bonus/adminer/
@@ -108,15 +132,3 @@ services:
       - portainer:/data
     networks:
       - inception
-volumes:
-  data:
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "/home/akhouya/data"
-  wordpress:
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "/home/akhouya/data"
-  portainer:

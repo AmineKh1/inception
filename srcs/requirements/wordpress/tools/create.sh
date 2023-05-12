@@ -1,7 +1,7 @@
 #!/bin/bash
-sleep 5
+sleep 10
 
-chown -R www-data *
+chown -R www-data /wordpress
 cd wordpress
 
 rm -rf wp-config.php
