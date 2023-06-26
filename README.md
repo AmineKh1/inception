@@ -223,6 +223,61 @@ You can update the start.sh script according to your specific requirements. For 
 Make sure to include the necessary commands and configurations for your specific environment.
 
 That's it for the Adminer container. Continue reading the README for information on other containers and services.
+### FTP Server Container
+The FTP server container allows you to set up an FTP server that points to the volume of your WordPress website.
+
+#### Dockerfile
+The Dockerfile for the FTP server container installs the VSFTPD server and copies the necessary configuration files.
+```Dockerfile
+FROM debian:buster
+
+RUN apt-get update
+RUN apt-get install -y vsftpd
+COPY vsftpd.conf /etc/vsftpd.conf
+COPY create.sh /create.sh
+RUN chmod 777 /etc/vsftpd.conf
+RUN chmod 777 /create.sh
+CMD ["/create.sh"]
+```
+
+#### FTP Configuration (vsftpd.conf)
+The vsftpd.conf file contains the configuration settings for the FTP server.
+```config
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+chroot_local_user=YES
+local_root=/home/akhouya42/ftp_directory
+pasv_min_port=40000
+pasv_max_port=40009
+local_umask=002
+listen=YES
+allow_writeable_chroot=YES
+secure_chroot_dir=/home/akhouya42/
+pasv_enable=YES
+pasv_address=10.12.176.31
+```
+You can modify the vsftpd.conf file to suit your specific requirements. Make sure to set the appropriate values for pasv_address to match your server's IP address.
+Make sure to replace /path/to/wordpress with the actual path to your WordPress website files.
+#### FTP User and Password
+The FTP server is configured with a default user akhouya42 and password 1234. You can change these credentials by modifying the create.sh script in the container.
+```bash
+#!/bin/bash
+
+adduser --disabled-password --gecos "" akhouya42
+echo "akhouya42" | tee -a /etc/vsftpd.userlist
+echo "akhouya42:1234" | chpasswd
+mkdir -p /home/akhouya42/ftp_directory
+chown akhouya42:akhouya42 /home/akhouya42/ftp_directory
+cd /home/akhouya42
+chmod -R 777 ftp_directory
+exec vsftpd
+```
+You can update the script to add a new user and set a custom password. Make sure to adjust the permissions and ownership of the FTP directory as needed.
+#### Accessing the FTP Server
+You can connect to the FTP server using an FTP client (e.g., FileZilla) by providing the FTP server's IP address, username (akhouya42), and password (1234). The FTP server will be listening on port 21.
+
+Ensure that the passive port range (40000-40009) is allowed in your firewall settings and properly forwarded to the FTP server if you're behind a NAT.
 
 
 ## Getting Started
