@@ -5,6 +5,50 @@ Before starting the project, make sure you have the following installed on your 
 
 - Docker
 - Docker Compose
+## Docker Compose Configuration
+Below is the Docker Compose configuration used to define the services and volumes for the application:
+### Volumes:
+The volumes section is used to define persistent storage for containers. It allows you to map directories or files from the host machine to the containers, ensuring that the data is preserved even if the container is stopped or removed.
+
+In the provided Docker Compose configuration, there are three defined volumes:
+```yml
+volumes:
+  data:
+    driver_opts:
+      type: "bind"
+      o: "bind"
+      device: "/home/akhouya/data/mysql"
+  wordpress:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/akhouya/data/wordpress"
+  portainer:
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/home/akhouya/data/portainer"
+```
+data: This volume is used to store the data for the MariaDB service. It is mounted to the /var/lib/mysql/ directory inside the container, which is the default data directory for MariaDB. The volume is defined as a bind mount, where the host's /home/akhouya/data/mysql directory is bound to the container's /var/lib/mysql/ directory.
+
+wordpress: This volume is used to store the data for the WordPress service. It is mounted to the /wordpress directory inside the container. Similar to the data volume, it is also defined as a bind mount, with the host's /home/akhouya/data/wordpress directory bound to the container's /wordpress directory.
+
+portainer: This volume is used by the Portainer service to persist its data. It is defined as a bind mount, with the host's /home/akhouya/data/portainer directory bound to the container's default data directory.
+
+### Networks:
+The networks section is used to define custom networks that containers can be connected to. It allows containers to communicate with each other using their service names as hostnames.
+
+In the provided Docker Compose configuration, there is one defined network:
+```yml
+networks:
+  inception:
+      driver: bridge
+```
+inception: This network is a custom bridge network created specifically for the project. All services defined in the configuration are connected to this network by specifying networks: - inception for each service.
+By connecting the services to the same network, they can communicate with each other using their service names as hostnames. For example, the WordPress service can communicate with the MariaDB service using the hostname mariadb.
+
+Defining custom networks helps in isolating the containers and provides a way for them to interact securely within the defined network scope.
+
 ## Containers
 ### MariaDB Container
 The MariaDB container is responsible for running the MariaDB server, which serves as the database for the WordPress application.
