@@ -279,5 +279,64 @@ You can connect to the FTP server using an FTP client (e.g., FileZilla) by provi
 
 Ensure that the passive port range (40000-40009) is allowed in your firewall settings and properly forwarded to the FTP server if you're behind a NAT.
 
+### Portainer Container
+The Portainer container allows you to deploy and manage containers through a user-friendly web interface.
+#### Dockerfile
 
+The Dockerfile for the Portainer container installs Portainer by downloading the release package and extracting it.
+FROM debian:buster
+```Dockerfile
+
+RUN apt-get update \
+    && apt-get install -y wget tar \
+    && wget https://github.com/portainer/portainer/releases/download/2.17.1/portainer-2.17.1-linux-amd64.tar.gz \
+    && tar xvzf /portainer-2.17.1-linux-amd64.tar.gz \
+    && rm -rf portainer-2.17.1-linux-amd64.tar.gz
+
+CMD ["/portainer/portainer"]
+```
+
+### Redis Container
+The Redis container provides a Redis server along with the PHP Redis extension. Redis is an open-source in-memory data structure store that can be used as a database, cache, and message broker.
+```Dockerfile
+FROM debian:buster
+
+RUN apt-get update 
+RUN apt-get install -y redis-server php-redis
+
+CMD redis-server --protected-mode no
+```
+#### Portfolio Container
+
+The Angular Application container allows you to build and run an Angular application using the Angular CLI.
+
+To create the Angular Application container, use the following Dockerfile:
+#### Dockerfile
+```Dockerfile
+# Base image
+FROM debian:buster
+
+# Set working directory
+WORKDIR /app
+
+# Update and install required packages
+RUN apt-get update && apt-get install -y curl gnupg
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs
+
+# Install Angular CLI
+RUN npm install -g @angular/cli
+
+# Copy app source code
+COPY . .
+
+# Install app dependencies
+RUN npm install
+
+# Expose port (optional)
+# EXPOSE 4200
+
+# Build and start the app
+CMD ["ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
+```
 ## Getting Started
