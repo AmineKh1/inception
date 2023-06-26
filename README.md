@@ -6,9 +6,9 @@ Before starting the project, make sure you have the following installed on your 
 - Docker
 - Docker Compose
 ## Containers
-### MariaDB
+### MariaDB Container
 The MariaDB container is responsible for running the MariaDB server, which serves as the database for the WordPress application.
-Dockerfile:
+#### Dockerfile
 ```Dockerfile
 FROM debian:buster
 
@@ -28,7 +28,6 @@ RUN service mysql start && ./create.sh
 # Start the MariaDB server
 CMD ["mysqld"]
 ```
-
 The Dockerfile sets up the MariaDB container by installing the mariadb-server package and allowing connections from outside the container. It copies the create.sh script into the container and sets the necessary permissions. It also sets the environment variables required for the script.
 
 The create.sh script is run during the container build process. It creates the database and user, grants privileges, and performs other necessary configurations.
@@ -41,10 +40,10 @@ Feel free to modify the script or Dockerfile according to your specific needs an
 
 Remember to provide the appropriate values for the environment variables when building or running the container.
 
-### wordpress
-The WordPress container runs the WordPress application using PHP-FPM.
-Dockerfile:
-
+### wordpress Container
+The WordPress container runs the WordPress application using PHP-FPM and connects it to the MariaDB database.
+#### Dockerfile
+The Dockerfile for the WordPress container installs PHP, PHP-FPM, PHP MySQL extension, MariaDB client, and other necessary dependencies. It also downloads and configures the WP-CLI tool for managing the WordPress installation.
 ```Dockerfile
 FROM debian:buster
 RUN apt-get update
@@ -66,7 +65,10 @@ RUN sed -i 's~listen = /run/php/php7\.3-fpm\.sock~listen = 9000~' /etc/php/7.3/f
 RUN chmod +x /create.sh
 CMD ["/create.sh"]
 ```
-create.sh:
+#### WordPress Connection to MariaDB
+The WordPress container needs to connect to the MariaDB database for storing and retrieving data. This connection is established during the container's startup using a script (create.sh).
+
+The create.sh script sets up the necessary configurations for WordPress, including the database host, database name, database user, and database password. It also installs the Redis Cache plugin and enables Redis caching for WordPress.
 ```bash
 #!/bin/bash
 sleep 10
@@ -92,19 +94,18 @@ wp redis enable --allow-root
 exec php-fpm7.3 -F -R
 ```
 
-The Dockerfile installs the necessary PHP, PHP-FPM, and MariaDB client packages. It also downloads and configures the WP-CLI tool to manage WordPress installations. The create.sh script is copied into the container and made executable. It modifies the WordPress configuration, installs plugins, enables Redis caching, and starts the PHP-FPM server.
+Make sure to replace the placeholders ${MYSQL_HOST}, ${MYSQL_DB}, ${MYSQL_USER}, ${MYSQL_PASSWORD}, ${WP_FS_METHOD}, ${WP_REDIS_HOST}, ${WP_REDIS_PORT}, ${URL_DNS}, ${WP_TITLE}, ${WP_ADMIN}, ${WP_ADMIN_PSW}, ${WP_ADMIN_EMAIL}, ${WP_USER}, and ${WP_EMAIL} with the appropriate values for your environment.
 
-Ensure that you have the create.sh script in the tools/ directory within your project structure.
+The create.sh script performs the necessary configurations and installations for WordPress and starts the PHP-FPM process to serve the WordPress application.
 
-Feel free to customize the script or Dockerfile based on your specific requirements and configurations.
-
-Remember to provide the appropriate values for the environment variables used in the script when building or running the container.
+That's it for the WordPress container. Continue reading the README for information on other containers and services.
 ### Nginx Container
 The Nginx container serves as a reverse proxy and handles incoming web requests for various services in our project. It also provides SSL encryption for secure communication.
 ####  Dockerfile
 The Dockerfile for the Nginx container installs Nginx and OpenSSL, copies the SSL certificate and key files, and updates the Nginx configuration.
-FROM debian:buster
+
 ```Dockerfile
+FROM debian:buster
 RUN apt-get update && apt-get install -y nginx && apt-get install -y openssl
 
 COPY tools/nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key
@@ -184,4 +185,44 @@ Make sure to replace wordpress, adminer, portfolio, and portainer with the appro
 By configuring Nginx as a reverse proxy, we can efficiently manage multiple services on a single server and handle SSL encryption for secure communication.
 
 You can find the SSL certificate and key files in the tools directory.
+
+### Adminer Container
+The Adminer container provides a web-based interface for managing the MariaDB database.
+
+#### Dockerfile
+The Dockerfile for the Adminer container installs the necessary dependencies, including PHP and PHP MySQL extension. It also downloads the latest version of Adminer and sets up the web server.
+```Dockerfile
+FROM debian:buster
+
+RUN apt-get update && apt-get install -y wget php php-mysql \
+    && mkdir -p /var/www/html/adminer/ \
+    && wget "http://www.adminer.org/latest.php" -O /var/www/html/adminer/index.php \
+    && mkdir /run/php/
+
+WORKDIR /var/www/html/adminer/
+
+CMD php -S 0.0.0.0:8080
+```
+#### Additional Configuration
+If you need to perform additional configuration for your web server (e.g., Apache), you can customize the startup script (start.sh) in the container. Here's an example:
+
+```bash
+#!/bin/bash
+
+service apache2 start
+service mysql start
+service apache2 reload
+a2enconf php*-fpm
+service apache2 reload
+a2enconf adminer
+service apache2 reload
+service apache2 restart
+```
+You can update the start.sh script according to your specific requirements. For example, the script above starts Apache, MySQL, reloads Apache configuration, enables the PHP-FPM configuration, reloads Apache again, and restarts Apache.
+
+Make sure to include the necessary commands and configurations for your specific environment.
+
+That's it for the Adminer container. Continue reading the README for information on other containers and services.
+
+
 ## Getting Started
