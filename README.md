@@ -163,15 +163,6 @@ CMD ["nginx", "-g", "daemon off;"]
 #### Nginx Configuration
 The Nginx configuration file (nginx.conf) is responsible for setting up the reverse proxy, SSL encryption, and handling various locations. It also includes proxy parameters for seamless communication with the backend services.
 ```conf
-user www-data;
-worker_processes auto;
-pid /run/nginx.pid;
-include /etc/nginx/modules-enabled/*.conf;
-
-events {
-    worker_connections 768;
-}
-
 http {
     server {
         listen 443 ssl;
@@ -224,7 +215,7 @@ http {
 }
 ```
 
-Make sure to replace wordpress, adminer, portfolio, and portainer with the appropriate hostnames or container names for your project.
+The container names are handled in docker-compose.yml file.
 
 By configuring Nginx as a reverse proxy, we can efficiently manage multiple services on a single server and handle SSL encryption for secure communication.
 
@@ -306,3 +297,49 @@ The Angular Application container allows you to build and run an Angular applica
 
 
 ## Getting Started
+Apologies for the misunderstanding. If you're using a Makefile to run the Docker Compose commands, here's an updated "Getting Started" section that includes the Makefile commands:
+
+To set up and run the application using Docker Compose with Makefile, follow these steps:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/AmineKh1/inception
+   cd inception
+```
+2.Build the Docker images and Start the containers:
+ ```bash
+make
+```
+This command will start the containers defined in the docker-compose.yml file.
+3.Access the services:
+WordPress: Open your web browser and go to https://intra.42.fr to access WordPress.
+Portainer: Open your web browser and go to https://portainer.intra.42.fr to access Portainer.
+Portfolio: Open your web browser and go to https:/intra.42.fr/portfolio to access Portfolio.
+adminer: Open your web browser and go to https:/intra.42.fr/adminer to access Adminer.
+4.Stop and remove the containers:
+```bash
+make down
+```
+5.Clean up Docker resources:
+```bash
+make fclean
+```
+This command will execute the fclean target in the Makefile, which runs the following commands:
+```bash
+docker system prune -a
+rm -rf /home/akhouya/data/mysql/*
+rm -rf /home/akhouya/data/wordpress/*
+rm -rf /home/akhouya/data/portainer/*
+```
+The first command will remove unused Docker resources, and the subsequent commands will remove the contents of the specified directories of volumes, because top level volumes we are ussing so docker command dont have acces to those directories.
+## Conclusion
+Congratulations on successfully setting up your Docker environment! You have learned how to define and link multiple containers using Docker Compose. This allows for scalable and portable deployment of your application.
+
+By leveraging Docker volumes, data persistence and seamless communication between containers are ensured. You have created services for your web server, database, WordPress, Redis, FTP server, adminer, portfolio, and Portainer.
+
+With the provided instructions and configurations, you can easily manage your application using Docker Compose commands. Explore further possibilities with Docker to enhance your application.
+
+Thank you for following along! Happy Dockerizing!
+
+
+
