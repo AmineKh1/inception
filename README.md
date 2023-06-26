@@ -187,23 +187,10 @@ By configuring Nginx as a reverse proxy, we can efficiently manage multiple serv
 You can find the SSL certificate and key files in the tools directory.
 
 ### Adminer Container
+
 The Adminer container provides a web-based interface for managing the MariaDB database.
 
-#### Dockerfile
-The Dockerfile for the Adminer container installs the necessary dependencies, including PHP and PHP MySQL extension. It also downloads the latest version of Adminer and sets up the web server.
-```Dockerfile
-FROM debian:buster
-
-RUN apt-get update && apt-get install -y wget php php-mysql \
-    && mkdir -p /var/www/html/adminer/ \
-    && wget "http://www.adminer.org/latest.php" -O /var/www/html/adminer/index.php \
-    && mkdir /run/php/
-
-WORKDIR /var/www/html/adminer/
-
-CMD php -S 0.0.0.0:8080
-```
-#### Additional Configuration
+#### Configuration
 If you need to perform additional configuration for your web server (e.g., Apache), you can customize the startup script (start.sh) in the container. Here's an example:
 
 ```bash
@@ -226,19 +213,6 @@ That's it for the Adminer container. Continue reading the README for information
 ### FTP Server Container
 The FTP server container allows you to set up an FTP server that points to the volume of your WordPress website.
 
-#### Dockerfile
-The Dockerfile for the FTP server container installs the VSFTPD server and copies the necessary configuration files.
-```Dockerfile
-FROM debian:buster
-
-RUN apt-get update
-RUN apt-get install -y vsftpd
-COPY vsftpd.conf /etc/vsftpd.conf
-COPY create.sh /create.sh
-RUN chmod 777 /etc/vsftpd.conf
-RUN chmod 777 /create.sh
-CMD ["/create.sh"]
-```
 
 #### FTP Configuration (vsftpd.conf)
 The vsftpd.conf file contains the configuration settings for the FTP server.
@@ -281,62 +255,10 @@ Ensure that the passive port range (40000-40009) is allowed in your firewall set
 
 ### Portainer Container
 The Portainer container allows you to deploy and manage containers through a user-friendly web interface.
-#### Dockerfile
 
-The Dockerfile for the Portainer container installs Portainer by downloading the release package and extracting it.
-FROM debian:buster
-```Dockerfile
-
-RUN apt-get update \
-    && apt-get install -y wget tar \
-    && wget https://github.com/portainer/portainer/releases/download/2.17.1/portainer-2.17.1-linux-amd64.tar.gz \
-    && tar xvzf /portainer-2.17.1-linux-amd64.tar.gz \
-    && rm -rf portainer-2.17.1-linux-amd64.tar.gz
-
-CMD ["/portainer/portainer"]
-```
-
-### Redis Container
-The Redis container provides a Redis server along with the PHP Redis extension. Redis is an open-source in-memory data structure store that can be used as a database, cache, and message broker.
-```Dockerfile
-FROM debian:buster
-
-RUN apt-get update 
-RUN apt-get install -y redis-server php-redis
-
-CMD redis-server --protected-mode no
-```
 #### Portfolio Container
 
 The Angular Application container allows you to build and run an Angular application using the Angular CLI.
 
-To create the Angular Application container, use the following Dockerfile:
-#### Dockerfile
-```Dockerfile
-# Base image
-FROM debian:buster
 
-# Set working directory
-WORKDIR /app
-
-# Update and install required packages
-RUN apt-get update && apt-get install -y curl gnupg
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs
-
-# Install Angular CLI
-RUN npm install -g @angular/cli
-
-# Copy app source code
-COPY . .
-
-# Install app dependencies
-RUN npm install
-
-# Expose port (optional)
-# EXPOSE 4200
-
-# Build and start the app
-CMD ["ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
-```
 ## Getting Started
