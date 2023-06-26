@@ -99,5 +99,89 @@ Ensure that you have the create.sh script in the tools/ directory within your pr
 Feel free to customize the script or Dockerfile based on your specific requirements and configurations.
 
 Remember to provide the appropriate values for the environment variables used in the script when building or running the container.
+### Nginx Container
+The Nginx container serves as a reverse proxy and handles incoming web requests for various services in our project. It also provides SSL encryption for secure communication.
+####  Dockerfile
+The Dockerfile for the Nginx container installs Nginx and OpenSSL, copies the SSL certificate and key files, and updates the Nginx configuration.
+FROM debian:buster
+```Dockerfile
+RUN apt-get update && apt-get install -y nginx && apt-get install -y openssl
 
+COPY tools/nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key
+COPY tools/nginx-selfsigned.crt /etc/ssl/certs/nginx-selfsigned.crt
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 443
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+#### Nginx Configuration
+The Nginx configuration file (nginx.conf) is responsible for setting up the reverse proxy, SSL encryption, and handling various locations. It also includes proxy parameters for seamless communication with the backend services.
+```conf
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+
+events {
+    worker_connections 768;
+}
+
+http {
+    server {
+        listen 443 ssl;
+        ssl_protocols TLSv1.3 TLSv1.2;
+        ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+        ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+
+        # Reverse proxy for WordPress
+        location / {
+            include proxy_params;
+            proxy_pass http://wordpress:9000;
+        }
+
+        # Reverse proxy for Adminer
+        location /adminer {
+            proxy_pass http://adminer:8080;
+        }
+
+        # Reverse proxy for Portfolio
+        location /portfolio/ {
+            proxy_pass http://portfolio:4200;
+        }
+
+        location ~ /portfolio/(.*) {
+            proxy_pass http://portfolio:4200/$1;
+        }
+
+        location ~ \.php$ {
+            include /etc/nginx/fastcgi_params;
+            fastcgi_param REQUEST_METHOD $request_method;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_pass wordpress:9000;
+        }
+    }
+
+    server {
+        listen 443 ssl;
+        ssl_protocols TLSv1.3 TLSv1.2;
+        ssl_ciphers AES128-SHA:AES256-SHA:RC4-SHA:DES-CBC3-SHA:RC4-MD5;
+        ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+        ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+
+        server_name portainer.akhouya.42.fr;
+
+        location / {
+            include proxy_params;
+            proxy_pass http://portainer:9000;
+        }
+    }
+}
+```
+
+Make sure to replace wordpress, adminer, portfolio, and portainer with the appropriate hostnames or container names for your project.
+
+By configuring Nginx as a reverse proxy, we can efficiently manage multiple services on a single server and handle SSL encryption for secure communication.
+
+You can find the SSL certificate and key files in the tools directory.
 ## Getting Started
