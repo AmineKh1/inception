@@ -53,6 +53,9 @@ By connecting the services to the same network, they can communicate with each o
 Defining custom networks helps in isolating the containers and provides a way for them to interact securely within the defined network scope.
 
 ## Containers
+#### Base Image: Debian Buster
+
+All containers in this project are based on the Debian Buster image. Debian Buster is a stable and widely used Linux distribution known for its reliability and security. By using Debian Buster as the base image, we ensure a consistent and stable environment for running our containers.
 ### MariaDB Container
 The MariaDB container is responsible for running the MariaDB server, which serves as the database for the WordPress application.
 #### Dockerfile
