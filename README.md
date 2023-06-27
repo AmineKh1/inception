@@ -1,6 +1,6 @@
 # inception
 This project aims to broaden your knowledge of system administration by using Docker. It involves setting up a small infrastructure composed of different services using Docker and Docker Compose. The project must be done on a Virtual Machine, and each service should run in a dedicated container.
-![XML Diagram](diagramm.png)
+![XML Diagram](digram.png)
 
 *Figure 1: Diagram of the system architecture*
 ## Prerequisites
