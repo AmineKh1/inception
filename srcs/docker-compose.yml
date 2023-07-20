@@ -73,8 +73,6 @@ services:
       - .env
     restart: unless-stopped
     init : true
-    ports:
-      - 6379:6379
     networks:
       - inception
     depends_on:
@@ -103,8 +101,6 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-    ports:
-      - 8080:8080
     init : true
     networks:
       - inception
@@ -114,8 +110,6 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-    ports:
-      - 4200:4200
     init : true
     networks:
       - inception
@@ -125,8 +119,6 @@ services:
     image : portainer
     restart: 'always'
     init : true
-    ports:
-      - 9000:9000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer:/data
