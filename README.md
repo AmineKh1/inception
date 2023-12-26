@@ -208,7 +208,7 @@ Apologies for the misunderstanding. If you're using a Makefile to run the Docker
 To set up and run the application using Docker Compose with Makefile, follow these steps:
 
 1. Clone the repository:
-   ```bash
+```bash
    git clone https://github.com/AmineKh1/inception
    cd inception
 ```
